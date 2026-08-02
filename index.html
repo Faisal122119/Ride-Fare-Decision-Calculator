@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ride Fare Decision Calculator</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Segoe UI',Arial,sans-serif;
+
+margin:0;
+padding:20px;
+
+min-height:100vh;
+
+background:
+linear-gradient(
+135deg,
+#667eea,
+#764ba2
+);
+
+}
+
+
+.container{
+
+max-width:520px;
+
+margin:auto;
+
+background:white;
+
+padding:25px;
+
+border-radius:20px;
+
+box-shadow:
+0 15px 40px rgba(0,0,0,0.25);
+
+}
+
+
+h1{
+
+text-align:center;
+
+color:#333;
+
+margin-bottom:5px;
+
+}
+
+
+.subtitle{
+
+text-align:center;
+
+color:#777;
+
+margin-bottom:25px;
+
+}
+
+
+
+label{
+
+font-weight:600;
+
+color:#333;
+
+}
+
+
+input{
+
+width:100%;
+
+padding:13px;
+
+margin-top:8px;
+
+margin-bottom:15px;
+
+border-radius:10px;
+
+border:1px solid #ccc;
+
+font-size:16px;
+
+}
+
+
+
+input:focus{
+
+outline:none;
+
+border-color:#667eea;
+
+}
+
+
+
+button{
+
+width:100%;
+
+padding:15px;
+
+background:
+
+linear-gradient(
+90deg,
+#667eea,
+#764ba2
+);
+
+border:none;
+
+border-radius:12px;
+
+color:white;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+opacity:0.9;
+
+}
+
+
+
+#results{
+
+display:none;
+
+margin-top:25px;
+
+}
+
+
+
+.result-card{
+
+background:#f7f9fc;
+
+padding:18px;
+
+border-radius:15px;
+
+}
+
+
+
+.result-card p{
+
+display:flex;
+
+justify-content:space-between;
+
+font-size:16px;
+
+border-bottom:1px solid #ddd;
+
+padding-bottom:8px;
+
+}
+
+
+
+.decision{
+
+margin-top:20px;
+
+padding:15px;
+
+text-align:center;
+
+font-size:24px;
+
+font-weight:bold;
+
+border-radius:15px;
+
+}
+
+
+
+.accept{
+
+background:#d4edda;
+
+color:#087f23;
+
+}
+
+
+.consider{
+
+background:#fff3cd;
+
+color:#856404;
+
+}
+
+
+.reject{
+
+background:#f8d7da;
+
+color:#b71c1c;
+
+}
+
+
+
+.suggest{
+
+margin-top:20px;
+
+background:#e3f2fd;
+
+padding:20px;
+
+text-align:center;
+
+border-radius:15px;
+
+font-size:22px;
+
+font-weight:bold;
+
+}
+
+
+
+.footer{
+
+text-align:center;
+
+margin-top:20px;
+
+color:#777;
+
+font-size:13px;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>🚕 Ride Fare Calculator</h1>
+
+<div class="subtitle">
+Smart Fare Decision & Profit Analysis
+</div>
+
+
+
+<label>Pickup Distance (KM)</label>
+
+<input id="pickup" type="number" placeholder="Enter pickup distance">
+
+
+
+<label>Trip Distance (KM)</label>
+
+<input id="trip" type="number" placeholder="Enter trip distance">
+
+
+
+<label>Estimated Time (Minutes)</label>
+
+<input id="time" type="number" placeholder="Enter estimated time">
+
+
+
+<label>Current Fare (Rs.)</label>
+
+<input id="fare" type="number" placeholder="Enter offered fare">
+
+
+
+<label>Fuel Cost (Rs.)</label>
+
+<input id="fuel" type="number" placeholder="Enter fuel price">
+
+
+
+<button onclick="calculate()">
+
+Calculate Fare Decision
+
+</button>
+
+
+
+
+
+<div id="results">
+
+
+<div class="result-card">
+
+
+<p>
+Total Distance
+<b id="distance">0</b>
+</p>
+
+
+<p>
+Per Trip Fuel Cost
+<b id="fuelCost">0</b>
+</p>
+
+
+<p>
+Commission (20%)
+<b id="commission">0</b>
+</p>
+
+
+<p>
+Depreciation Cost
+<b id="depreciation">0</b>
+</p>
+
+
+<p>
+Total Cost
+<b id="totalCost">0</b>
+</p>
+
+
+<p>
+Net Profit
+<b id="profit">0</b>
+</p>
+
+
+</div>
+
+
+
+<div id="decision" class="decision">
+
+</div>
+
+
+
+<div class="suggest">
+
+Suggested Fare
+
+<br>
+
+<span id="suggested">
+
+0
+
+</span>
+
+Rs
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="footer">
+
+Fuel Efficiency: 18 KM/L | Depreciation: 5 Rs/KM | Commission: 20%
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+function calculate(){
+
+
+let pickup =
+Number(document.getElementById("pickup").value);
+
+
+let trip =
+Number(document.getElementById("trip").value);
+
+
+let fare =
+Number(document.getElementById("fare").value);
+
+
+let fuel =
+Number(document.getElementById("fuel").value);
+
+
+
+let distance =
+pickup + trip;
+
+
+
+let fuelCost =
+(distance/18)*fuel;
+
+
+
+let commission =
+fare*0.20;
+
+
+
+let depreciation =
+distance*5;
+
+
+
+let totalCost =
+fuelCost+commission+depreciation;
+
+
+
+let profit =
+fare-totalCost;
+
+
+
+let decisionBox =
+document.getElementById("decision");
+
+
+
+if(profit>=80){
+
+decisionBox.innerHTML="ACCEPT ✅";
+
+decisionBox.className="decision accept";
+
+}
+
+else if(profit>=60){
+
+decisionBox.innerHTML="CONSIDER ⚠️";
+
+decisionBox.className="decision consider";
+
+}
+
+else{
+
+decisionBox.innerHTML="REJECT ❌";
+
+decisionBox.className="decision reject";
+
+}
+
+
+
+
+let suggested;
+
+
+
+if(
+fare>0 &&
+(profit/fare)>=0.35 &&
+profit>=80
+)
+
+{
+
+suggested=fare;
+
+}
+
+else{
+
+suggested=totalCost/(1-0.35);
+
+}
+
+
+
+document.getElementById("distance").innerHTML=
+distance.toFixed(2)+" KM";
+
+
+document.getElementById("fuelCost").innerHTML=
+fuelCost.toFixed(2)+" Rs";
+
+
+document.getElementById("commission").innerHTML=
+commission.toFixed(2)+" Rs";
+
+
+document.getElementById("depreciation").innerHTML=
+depreciation.toFixed(2)+" Rs";
+
+
+document.getElementById("totalCost").innerHTML=
+totalCost.toFixed(2)+" Rs";
+
+
+document.getElementById("profit").innerHTML=
+profit.toFixed(2)+" Rs";
+
+
+document.getElementById("suggested").innerHTML=
+suggested.toFixed(2);
+
+
+
+document.getElementById("results").style.display="block";
+
+
+}
+
+
+</script>
+
+
+</body>
+</html>
